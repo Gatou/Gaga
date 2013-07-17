@@ -3,12 +3,13 @@ package com.me.mygdxgame.sprite;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Disposable;
-import com.me.mygdxgame.mgr.TextureMgr;
+import com.me.mygdxgame.mgr.TextureManager;
 
 public class SpriteBase extends Sprite implements Disposable{
 
-	public SpriteBase(Texture texture){
-		super(texture);
+	public SpriteBase(String textureFilename){
+		super();
+		setTexture(textureFilename);
 	}
 	
 	@Override
@@ -47,8 +48,8 @@ public class SpriteBase extends Sprite implements Disposable{
 		setPosition(getX() - getOriginX(), getY() - getOriginY());
 	}
 
-	public void setTexture(String textureName){
-		Texture texture = TextureMgr.get(textureName);
+	public void setTexture(String textureFilename){
+		Texture texture = TextureManager.instance().get(textureFilename);
 		super.setTexture(texture);
 		setRegion(0, 0, texture.getWidth(), texture.getHeight());
 		setColor(1, 1, 1, 1);

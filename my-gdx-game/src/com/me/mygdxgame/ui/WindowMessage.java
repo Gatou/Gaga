@@ -1,12 +1,9 @@
 package com.me.mygdxgame.ui;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
-import com.me.mygdxgame.mgr.WindowMgr;
 
 public class WindowMessage extends WindowBase{
 

@@ -5,38 +5,39 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import com.badlogic.gdx.math.Vector3;
 import com.me.mygdxgame.data.Data;
-import com.me.mygdxgame.data.DataMap;
-import com.me.mygdxgame.data.DataTileset;
+import com.me.mygdxgame.data.MapData;
 import com.me.mygdxgame.game.GameMover;
-import com.me.mygdxgame.mgr.PhysicsManager;
-import com.me.mygdxgame.utils.Cst;
-import com.me.mygdxgame.utils.Point2f;
 import com.me.mygdxgame.utils.Point2i;
 
 public class GameMap {
 
 	int mapId;
-	public DataMap mapData;
+	public MapData mapData;
 	private Map<String, List<GameMover>> tileEvents;
 	private List<GameMover> events;
-	public CollisionHandler collisionHandler;
-	//public DataTileset tileset;
+
 	
 	public GameMap() {
-		collisionHandler = new CollisionHandler();
 	}
 	
 	public void setup(int mapId) {
 		this.mapId = mapId;
-		mapData = Data.maps.get(mapId);
 		
-		collisionHandler.setup(mapData);
+		if(mapId == -1){
+			mapData = new MapData(-1, "");
+			mapData.generateRandomMap();
+		}
+		else{
+			mapData = Data.maps.get(mapId);
+			
+		}
+		
 		setupEvents();
-		PhysicsManager.getInstance().setup();
 	}
 
+
+	
 	public void setupEvents(){
 		tileEvents = new Hashtable<String, List<GameMover>>();
 		events = new ArrayList<GameMover>();

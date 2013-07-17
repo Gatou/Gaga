@@ -1,33 +1,18 @@
 package com.me.mygdxgame;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.List;
-
-import aurelienribon.tweenengine.TweenManager;
-
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
 import com.me.mygdxgame.game.Game;
 import com.me.mygdxgame.mgr.DataMgr;
-import com.me.mygdxgame.mgr.PhysicsManager;
-import com.me.mygdxgame.mgr.SceneMgr;
 import com.me.mygdxgame.mgr.StageMgr;
-import com.me.mygdxgame.mgr.TweenMgr;
-import com.me.mygdxgame.mgr.WindowMgr;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
+import com.me.mygdxgame.scene.SceneBase;
+import com.me.mygdxgame.scene.SceneMap;
+import com.me.mygdxgame.utils.Cst;
+
 
 public class App implements ApplicationListener{
 	
-
-	private static TweenManager manager;
-	
-
 		
-
+	SceneBase scene;
 	
 	@Override 
 	public void create() {
@@ -56,20 +41,20 @@ public class App implements ApplicationListener{
 	    //System.out.println(person.tilemap[1][4]);	
 		//Debug.setDebugMode(true);
 		DataMgr.init();
-		WindowMgr.init();
 		StageMgr.init();
-		TweenMgr.init();
+		//TweenMgr.init();
 		//ScriptMgr.init();
-		SceneMgr.init();
-		PhysicsManager.getInstance();
 		//Gdx.graphics.setDisplayMode(800, 480, false);
-		Gdx.graphics.setVSync(true);
+		//Gdx.graphics.setVSync(true);
+		//resize(0, 0);
+		scene = new SceneMap();
 	}
 	
 	@Override
 	public void render() {
-		TweenMgr.update();
-		SceneMgr.update();
+		scene.update();
+		//TweenMgr.update();
+		//SceneMgr.update();
 	}
 		
 	@Override
@@ -78,8 +63,10 @@ public class App implements ApplicationListener{
 	
 	@Override
 	public void resize(int width, int height) {
+		width = Cst.VIEWPORT_WIDTH;
+		height = Cst.VIEWPORT_HEIGHT;
 		Game.camera.resize(width,height);
-		WindowMgr.resize(width, height);
+		StageMgr.resize(width, height);
 	}
 	
 	@Override

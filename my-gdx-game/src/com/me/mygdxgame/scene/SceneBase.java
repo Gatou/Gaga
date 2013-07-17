@@ -1,7 +1,6 @@
 package com.me.mygdxgame.scene;
 
 import com.me.mygdxgame.mgr.StageMgr;
-import com.me.mygdxgame.mgr.WindowMgr;
 
 public abstract class SceneBase{
 
