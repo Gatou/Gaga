@@ -7,11 +7,16 @@ public class Cst {
 	
 	public static final Plane XY_PLANE = new Plane(new Vector3(0, 0, 1), 0);
 	
-	public static final int TILE_W = 32;
-	public static final int TILE_H = 32;
+	public static final int TILE_W = 64;
+	public static final int TILE_H = 64;
+	
+	public static final int TILE_W_HALF = TILE_W/2;
+	public static final int TILE_H_HALF = TILE_H/2;
 	
 	public static final int VIEWPORT_WIDTH = 800;
 	public static final int VIEWPORT_HEIGHT = 480;
+	
+	public static final int WALL_HEIGHT = 64;
 	//public static final Point2i MAP_SIZE = new Point2i(10, 10);
 
 	//public static final int TILE_HW = TILE_W / 2;

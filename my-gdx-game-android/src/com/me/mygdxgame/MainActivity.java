@@ -17,6 +17,6 @@ public class MainActivity extends AndroidApplication {
 	      cfg.useAccelerometer = false;
 	      cfg.useCompass = false;
 	        
-	      initialize(new App(), cfg);
+	      initialize(App.instance(), cfg);
 	   }
 	}

@@ -1,16 +1,14 @@
 package com.me.mygdxgame.mgr;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import com.me.mygdxgame.data.Data;
-import com.me.mygdxgame.data.MapData;
 import com.me.mygdxgame.data.DataTileset;
 import com.me.mygdxgame.data.DataTileset.Passability;
+import com.me.mygdxgame.data.MapData;
 import com.me.mygdxgame.game.Game;
 import com.me.mygdxgame.game.GameCamera;
 import com.me.mygdxgame.game.map.GameMap;
-import com.me.mygdxgame.utils.Cst;
 
 public class DataMgr {
 

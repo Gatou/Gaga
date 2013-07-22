@@ -1,18 +1,36 @@
 package com.me.mygdxgame;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.me.mygdxgame.game.Game;
+import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.mgr.DataMgr;
 import com.me.mygdxgame.mgr.StageMgr;
 import com.me.mygdxgame.scene.SceneBase;
 import com.me.mygdxgame.scene.SceneMap;
 import com.me.mygdxgame.utils.Cst;
+import com.me.mygdxgame.utils.TweenXYAccessor;
 
 
 public class App implements ApplicationListener{
 	
-		
-	SceneBase scene;
+	public TweenManager tweenManager = new TweenManager();
+	private static App instance;
+	
+	public static App instance(){
+		if(instance == null){
+			instance = new App();
+		}
+		return instance;
+	}
+	
+	public SceneBase scene;
+	
+	private App() {
+		Tween.registerAccessor(GameMover.class, new TweenXYAccessor());
+	}
 	
 	@Override 
 	public void create() {
@@ -47,11 +65,14 @@ public class App implements ApplicationListener{
 		//Gdx.graphics.setDisplayMode(800, 480, false);
 		//Gdx.graphics.setVSync(true);
 		//resize(0, 0);
-		scene = new SceneMap();
+		
 	}
 	
 	@Override
 	public void render() {
+		if(scene == null){
+			scene = new SceneMap();
+		}
 		scene.update();
 		//TweenMgr.update();
 		//SceneMgr.update();

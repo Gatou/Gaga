@@ -3,23 +3,32 @@ package com.me.mygdxgame.mgr;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.me.mygdxgame.sprite.SpriteBase;
 
 public class SpriteManager {
 
 	private static SpriteManager instance;
-	private List<SpriteBase> cache;
+	private List<Sprite> cache;
 	
 	private SpriteManager(){
-		cache = new ArrayList<SpriteBase>();
+		cache = new ArrayList<Sprite>();
 		
+		//Sprite sprite = new Sprite(TextureManager.instance().get("tileset.png"));
+		
+		//for(int i=0; i<16; i++){
+		//	Sprite sprite = new Sprite()
+		//}
+		//sprite.setOrigin(0, 96);
+		//cache.add(sprite);
+		/*
 		SpriteBase sprite = new SpriteBase("wall_0.png");
 		sprite.setOrigin(0, 96);
 		cache.add(sprite);
 		
 		sprite = new SpriteBase("floor_0.png");
-		sprite.setOrigin(0, 32);
-		cache.add(sprite);
+		sprite.setOrigin(0, 96);
+		cache.add(sprite);*/
 	}
 	
 	public static SpriteManager instance(){
@@ -29,7 +38,7 @@ public class SpriteManager {
 		return instance;
 	}
 	
-	public SpriteBase get(int index){
+	public Sprite get(int index){
 		return cache.get(index);
 	}
 	

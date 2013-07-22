@@ -54,6 +54,6 @@ public class SpriteBase extends Sprite implements Disposable{
 		setRegion(0, 0, texture.getWidth(), texture.getHeight());
 		setColor(1, 1, 1, 1);
 		setSize(Math.abs(texture.getWidth()), Math.abs(texture.getHeight()));
-		flip(false, true);
+		//flip(false, true);
 	}
 }

@@ -1,10 +1,16 @@
 package com.me.mygdxgame.scene;
 
+import com.badlogic.gdx.Gdx;
+import com.me.mygdxgame.App;
 import com.me.mygdxgame.mgr.StageMgr;
 
 public abstract class SceneBase{
 
+	
+	
+	
 	public void start() {
+		
 	}
 
 	public void update() {
@@ -14,6 +20,7 @@ public abstract class SceneBase{
 	}
 	
 	public void updatePre(){
+		
 		//IntervalMgr.update();
 	}
 	
