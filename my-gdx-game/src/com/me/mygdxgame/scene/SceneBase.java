@@ -1,7 +1,7 @@
 package com.me.mygdxgame.scene;
 
 import com.badlogic.gdx.Gdx;
-import com.me.mygdxgame.mgr.StageMgr;
+import com.me.mygdxgame.mgr.StageManager;
 
 public abstract class SceneBase{
 
@@ -30,7 +30,7 @@ public abstract class SceneBase{
 	
 	public void updatePost(){
 		//WindowMgr.update();
-		StageMgr.update();
+		StageManager.instance().update();
 	}
 	
 	public void terminate() {

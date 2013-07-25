@@ -11,15 +11,19 @@ import com.me.mygdxgame.game.GameParty;
 import com.me.mygdxgame.game.unit.GameUnit;
 import com.me.mygdxgame.game.unit.GameUnit.UnitType;
 import com.me.mygdxgame.sprite.WallSpriteState;
+import com.me.mygdxgame.utils.Point2HashMap;
 
 public class DestroyWallAction extends GameAction{
 
+	public static Point2HashMap<Integer, Integer, DestroyWallAction> cache = new Point2HashMap<Integer, Integer, DestroyWallAction>();
+	
 	public List<GameUnit> units;
 	public GameParty party;
 	public int maxUnits;
 	int i, j;
 	int hp;
 	boolean reachable;
+	boolean interrupted;
 	
 	public DestroyWallAction() {
 		units = new ArrayList<GameUnit>();
@@ -36,10 +40,17 @@ public class DestroyWallAction extends GameAction{
 		WallSpriteState wallState = new WallSpriteState();
 		wallState.selected = true;
 		party.wallStates.put(i, j, wallState);
+		
+		cache.put(i, j, this);
 	}
 	
 	public void update(){
 		super.update();
+		
+		if(interrupted){
+			clear();
+			return;
+		}
 		
 		if(!isPositionReachable()){
 			return;
@@ -65,10 +76,21 @@ public class DestroyWallAction extends GameAction{
 	
 	public void completed(){
 		Game.map.mapData.setTile(i, j, (short)15);
+		clear();
+	}
+	
+	public void interrupt(){
+		interrupted = true;
+		clear();
+	}
+	
+	public void clear(){
+		DestroyWallAction.cache.remove(i, j);
 		for(GameUnit unit : units){
-			unit.ai.actionState = AiActionState.WAIT;
+			unit.actionCompleted();
 		}
 		units.clear();
+		
 		party.completedActionQueue.add(this);
 		party.wallStates.remove(i, j);
 	}
@@ -130,5 +152,6 @@ public class DestroyWallAction extends GameAction{
 		}
 	}
 	
+
 	
 }

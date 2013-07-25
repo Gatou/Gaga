@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,9 +19,10 @@ import com.me.mygdxgame.game.Game;
 import com.me.mygdxgame.game.GameCamera;
 import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.game.action.DestroyWallAction;
-import com.me.mygdxgame.mgr.StageMgr;
+import com.me.mygdxgame.mgr.StageManager;
 import com.me.mygdxgame.sprite.SpriteBase;
 import com.me.mygdxgame.sprite.WallSpriteState;
+import com.me.mygdxgame.ui.MapUi;
 import com.me.mygdxgame.utils.Cst;
 import com.me.mygdxgame.utils.Grid;
 
@@ -41,13 +41,15 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 		Game.map.setup(-1);
 		plex = new InputMultiplexer();
 		
-		plex.addProcessor(StageMgr.stage);
+		plex.addProcessor(StageManager.instance().stage);
 		plex.addProcessor(this);
 		spriteBatch = new SpriteBatch();
 		//tileset = TextureManager.get("tileset.png");
 		Gdx.input.setInputProcessor(plex);
 		
-		
+		StageManager.instance().clear();
+		StageManager.instance().setFpsVisible(true);
+		StageManager.instance().setRoot(new MapUi());
 		
 	}
 
@@ -269,9 +271,16 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 			
 			
 			if(Game.map.mapData.tilemap[i][j] != 15){
-				DestroyWallAction action = new DestroyWallAction();
-				action.setup(Game.map.parties.get(0), i, j);
-				Game.map.parties.get(0).actionQueue.add(action);
+				DestroyWallAction cachedAction = DestroyWallAction.cache.get(i, j);
+				if(cachedAction != null){
+					cachedAction.interrupt();
+					Game.map.parties.get(0).completedActionQueue.add(cachedAction);
+				}
+				else{
+					DestroyWallAction action = new DestroyWallAction();
+					action.setup(Game.map.parties.get(0), i, j);
+					Game.map.parties.get(0).actionQueue.add(action);
+				}
 				
 			}
 			//GameMover mover = Game.map.parties.get(0).units.get(0);

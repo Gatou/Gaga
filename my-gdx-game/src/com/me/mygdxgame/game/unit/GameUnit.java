@@ -1,6 +1,7 @@
 package com.me.mygdxgame.game.unit;
 
 import com.me.mygdxgame.ai.unit.MoverAi;
+import com.me.mygdxgame.ai.unit.Ai.AiActionState;
 import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.sprite.SpriteBase;
 
@@ -22,6 +23,11 @@ public class GameUnit extends GameMover{
 	public void update(){
 		super.update();
 		ai.update();
+	}
+
+	public void actionCompleted() {
+		ai.actionState = AiActionState.WAIT;
+		path = null;
 	}
 
 
