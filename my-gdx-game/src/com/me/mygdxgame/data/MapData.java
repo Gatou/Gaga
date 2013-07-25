@@ -41,14 +41,15 @@ public class MapData extends DataBase{
 		}
 		
 		startI = 1+rand.nextInt(width-2);
-		startJ = 1+rand.nextInt(width-2);
+		//startJ = 1+rand.nextInt(width-2);
+		startJ = 14;
 		
 		GameParty party = new GameParty();
 		Game.map.parties.add(party);
 		
 		//setTile(5,5,(short) 15);
 		//setTile(5,5+1,(short) 15);
-		
+		/*
         for(int i=0; i<width; i++){
         	for(int j=0; j<height; j++){
         		if(i<=0 || j <=0 || i>=Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
@@ -56,7 +57,7 @@ public class MapData extends DataBase{
         			Game.map.mapData.tilemap[i][j] = -1;
         		}
         	}
-        }
+        }*/
         
 		generateCross(startI, startJ, (short) 15, 4, 0);
 		

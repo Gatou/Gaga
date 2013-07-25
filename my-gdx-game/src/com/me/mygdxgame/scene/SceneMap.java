@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,7 +25,6 @@ import com.me.mygdxgame.sprite.SpriteBase;
 import com.me.mygdxgame.sprite.WallSpriteState;
 import com.me.mygdxgame.utils.Cst;
 import com.me.mygdxgame.utils.Grid;
-import com.me.mygdxgame.utils.Point2i;
 
 public class SceneMap extends SceneBase implements InputProcessor, GestureListener{
 
@@ -175,6 +175,11 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 						}
 					}
 					
+					/*
+					if(Game.map.mapData.tilemap[i][j-1] == 15){
+						Color c = sprite.getColor();
+						sprite.setColor(c.r, c.g, c.b, 0.8f);
+					}*/
 					sprite.draw(spriteBatch);
 				}
 				List<GameMover> events =  Game.map.eventsAt(i, j);
@@ -241,14 +246,24 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 			Vector3 v = new Vector3();
 			Ray pickRay = Game.camera.getPickRay(x, y);
 			Intersector.intersectRayPlane(pickRay, Cst.XY_PLANE, v);
-			int i = (int)v.x/Cst.TILE_W;
-			int j = (int)v.y/Cst.TILE_H;
 			
-			if(i<=0 || j <=0 || i>=Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
+			if(v.x < 0 || v.y < 0){
 				return false;
 			}
 			
-			if(Game.map.mapData.tilemap[i][j+1] != 15){
+			int i = (int)v.x/Cst.TILE_W;
+			int j = (int)v.y/Cst.TILE_H;
+			
+			//System.out.println(i + " " + j);
+			if(i<=0 || j < 0 || i >= Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
+				return false;
+			}
+
+			if((j==0 && Game.map.mapData.tilemap[i][j+1] == 15) || (j==Game.map.mapData.height-2 && Game.map.mapData.tilemap[i][j+1] != 15)){
+				return false;
+			}
+			
+			if(j+1 < Game.map.mapData.height-1 && Game.map.mapData.tilemap[i][j+1] != 15){
 				j += 1;
 			}
 			
