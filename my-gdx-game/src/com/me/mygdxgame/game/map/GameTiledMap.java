@@ -5,12 +5,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import com.me.mygdxgame.ai.pathfinding.TileBasedMap;
 import com.me.mygdxgame.data.Data;
 import com.me.mygdxgame.data.MapData;
 import com.me.mygdxgame.game.Game;
 import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.game.GameParty;
-import com.me.mygdxgame.ia.TileBasedMap;
 import com.me.mygdxgame.utils.Point2i;
 
 public abstract class GameTiledMap implements TileBasedMap{
@@ -93,7 +93,7 @@ public abstract class GameTiledMap implements TileBasedMap{
 
 	@Override
 	public boolean blocked(GameMover mover, int i, int j) {
-		boolean mapCollision = mapData.tilemap[i][j] != 0; 
+		boolean mapCollision = mapData.tilemap[i][j] != 15; 
 		if(mapCollision){
 			return true;
 		}

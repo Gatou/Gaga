@@ -1,4 +1,4 @@
-package com.me.mygdxgame.ia;
+package com.me.mygdxgame.ai.pathfinding;
 
 
 import java.util.ArrayList;
@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.me.mygdxgame.ai.pathfinding.heuristics.ManhattanHeuristic;
 import com.me.mygdxgame.game.GameMover;
-import com.me.mygdxgame.ia.heuristics.ManhattanHeuristic;
 
 
 /**
@@ -18,8 +18,8 @@ import com.me.mygdxgame.ia.heuristics.ManhattanHeuristic;
  */
 public class AStarPathFinder implements PathFinder {
 	/** The set of nodes that have been searched through */
-	@SuppressWarnings("rawtypes")
-	private ArrayList closed = new ArrayList();
+
+	private ArrayList<Node> closed = new ArrayList<Node> ();
 	/** The set of nodes that we do not yet consider fully searched */
 	private SortedList open = new SortedList();
 	
@@ -244,7 +244,6 @@ public class AStarPathFinder implements PathFinder {
 	 * 
 	 * @param node The node to add to the closed list
 	 */
-	@SuppressWarnings("unchecked")
 	protected void addToClosed(Node node) {
 		closed.add(node);
 	}
@@ -326,8 +325,7 @@ public class AStarPathFinder implements PathFinder {
 	 */
 	private class SortedList {
 		/** The list of elements */
-		@SuppressWarnings("rawtypes")
-		private ArrayList list = new ArrayList();
+		private ArrayList<Node>  list = new ArrayList<Node> ();
 		
 		/**
 		 * Retrieve the first element from the list
@@ -352,7 +350,7 @@ public class AStarPathFinder implements PathFinder {
 		 */
 		@SuppressWarnings("unchecked")
 		public void add(Object o) {
-			list.add(o);
+			list.add((Node)o);
 			Collections.sort(list);
 		}
 		

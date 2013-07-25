@@ -1,4 +1,4 @@
-package com.me.mygdxgame.ia;
+package com.me.mygdxgame.ai.pathfinding;
 
 
 /**

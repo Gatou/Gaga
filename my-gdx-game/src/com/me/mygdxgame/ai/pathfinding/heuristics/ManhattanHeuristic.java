@@ -1,8 +1,8 @@
-package com.me.mygdxgame.ia.heuristics;
+package com.me.mygdxgame.ai.pathfinding.heuristics;
 
+import com.me.mygdxgame.ai.pathfinding.AStarHeuristic;
+import com.me.mygdxgame.ai.pathfinding.TileBasedMap;
 import com.me.mygdxgame.game.GameMover;
-import com.me.mygdxgame.ia.AStarHeuristic;
-import com.me.mygdxgame.ia.TileBasedMap;
 
 public class ManhattanHeuristic implements AStarHeuristic {
 

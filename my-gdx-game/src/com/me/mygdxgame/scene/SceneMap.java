@@ -18,10 +18,10 @@ import com.me.mygdxgame.App;
 import com.me.mygdxgame.game.Game;
 import com.me.mygdxgame.game.GameCamera;
 import com.me.mygdxgame.game.GameMover;
-import com.me.mygdxgame.ia.AStarPathFinder;
-import com.me.mygdxgame.ia.Path;
+import com.me.mygdxgame.game.action.DestroyWallAction;
 import com.me.mygdxgame.mgr.StageMgr;
 import com.me.mygdxgame.sprite.SpriteBase;
+import com.me.mygdxgame.sprite.WallSpriteState;
 import com.me.mygdxgame.utils.Cst;
 import com.me.mygdxgame.utils.Grid;
 import com.me.mygdxgame.utils.Point2i;
@@ -36,7 +36,6 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 	InputMultiplexer plex;
 	public static Grid grid = new Grid();
 	
-	
 	public SceneMap(){
 		//StageMgr.startStageLater(new StageMap());
 		Game.map.setup(-1);
@@ -48,10 +47,13 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 		//tileset = TextureManager.get("tileset.png");
 		Gdx.input.setInputProcessor(plex);
 		
+		
+		
 	}
 
 	public void updatePre(){
 		super.updatePre();
+		//updateTime = ...
 	}
 
 	public void updateMain(){
@@ -61,7 +63,7 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 
 		Game.camera.update();
 		Game.map.update();
-		App.instance().tweenManager.update(Gdx.graphics.getDeltaTime());
+		App.instance().tweenManager.update(updateTime);
 		
 		spriteBatch.setProjectionMatrix(Game.camera.combined);
 		
@@ -89,10 +91,32 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
         
         for(int i=startI; i<endI; i++){
         	for(int j=startJ; j<endJ; j++){
+        		if(i<=0 || j <=0 || i>=Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
+        			continue;
+        			//Game.map.mapData.tilemap[i][j] = -1;
+        		}
 				int spriteIndex = Game.map.mapData.tilemap[i][j];
 				if(spriteIndex == 0){
-					SpriteBase sprite = new SpriteBase("tileset3.png");
-					sprite.setRegion((spriteIndex%16)*Cst.TILE_W, 0, Cst.TILE_W, 128);
+					if(Game.map.mapData.tilemap[i-1][j] != 15 && Game.map.mapData.tilemap[i+1][j] != 15 && Game.map.mapData.tilemap[i][j+1] != 15 && Game.map.mapData.tilemap[i][j-1] != 15){
+						Game.map.mapData.tilemap[i][j] = -1;
+					}
+					/*
+					SpriteBase sprite = new SpriteBase("tileset4.png");
+					sprite.setRegion((spriteIndex%16)*Cst.TILE_W, 64, Cst.TILE_W, 64);
+					sprite.setSize(Cst.TILE_W, 128);
+					sprite.flip(false, true);
+					sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
+					sprite.draw(spriteBatch);*/
+				}
+        	}
+        }
+        
+        for(int i=startI; i<endI; i++){
+        	for(int j=startJ; j<endJ; j++){
+				int spriteIndex = Game.map.mapData.tilemap[i][j];
+				if(spriteIndex == 15){
+					SpriteBase sprite = new SpriteBase("tileset4.png");
+					sprite.setRegion((spriteIndex%16)*Cst.TILE_W, (spriteIndex/16)*128, Cst.TILE_W, 128);
 					sprite.setSize(Cst.TILE_W, 128);
 					sprite.flip(false, true);
 					sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
@@ -102,41 +126,56 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
         }
         
         for(int j=startJ; j<endJ; j++){
-        for(int i=startI; i<endI; i++){
+        	for(int i=startI; i<endI; i++){
         	
 				int spriteIndex = Game.map.mapData.tilemap[i][j];
-				if(spriteIndex != 0){
+				if(spriteIndex != 15){
 					//if(spriteIndex==15){
 					//	continue;
 					//}
-					SpriteBase sprite = new SpriteBase("tileset3.png");
-					sprite.setRegion((spriteIndex%16)*Cst.TILE_W, 0, Cst.TILE_W, 128);
-					sprite.setSize(Cst.TILE_W, 128);
+					SpriteBase sprite = new SpriteBase("tileset4.png");
+					
+					if(spriteIndex == -1){
+						sprite.setRegion((15%16)*Cst.TILE_W, 64, Cst.TILE_W, 64);
+						sprite.setSize(Cst.TILE_W, 64);
+						//sprite.setColor(0.5f, 0.5f, 0.5f, 0.5f);
+						sprite.setOrigin(0, 64);
+					}
+					else{
+						sprite.setRegion((spriteIndex%16)*Cst.TILE_W, (spriteIndex/16)*128, Cst.TILE_W, 128);
+						sprite.setSize(Cst.TILE_W, 128);
+						sprite.setOrigin(0, 64);
+					}
+					
+					
 					//Sprite sprite = SpriteManager.instance().get(0);
 					//sprite.setSize(32, 96);
 					//sprite.setBounds(0, -96, 32, -96);
 					//sprite.setRegion((spriteIndex%16)*Cst.TILE_W, 0, 32, 96);
 					
-					if(spriteIndex==0){
-						sprite.setOrigin(0, 0);
+					//if(spriteIndex==0){
+						//sprite.setOrigin(0, 0);
 						//continue;
-					}
-					else{
-						sprite.setOrigin(0, 64);
+					//}
+					//else{
+						//sprite.setOrigin(0, 64);
 						//sprite.setColor(1f, 1f, 1f, 0.5f);
 						// normalement sprite.setOrigin(0, 96); voir si pb lors du render order
 						//continue;
-					}
+					//}
 					//sprite.setOrigin(0, 0);
 					sprite.flip(false, true);
 					sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
+					
+					WallSpriteState wallState = Game.map.parties.get(0).wallStates.get(i, j);
+					if(wallState != null){
+						//System.out.println(i + " " + j);
+						if(wallState.selected){
+							sprite.setColor(1, 0, 0, 1);
+						}
+					}
+					
 					sprite.draw(spriteBatch);
-					/*
-					int tilex = (tileIndex % 8) * 32;
-					int tiley = (tileIndex / 8) * 32;
-					Sprite sprite = new Sprite(tileset, tilex, tiley, 32, 32);
-					sprite.setPosition(i*32, j*32);
-					sprite.draw(spriteBatch);*/
 				}
 				List<GameMover> events =  Game.map.eventsAt(i, j);
 				if(events != null){
@@ -152,8 +191,9 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
         
 		
 		spriteBatch.end();
-		grid.update(startI, startJ, endI, endJ);
+		//grid.update(startI, startJ, endI, endJ);
 
+        
 	}
 
 
@@ -186,7 +226,7 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 			break;
 		case '5':
 			//System.out.println("lala");
-			GameMover mover = Game.map.parties.get(0).members.get(0);
+			GameMover mover = Game.map.parties.get(0).units.get(0);
 			//mover.findPath(0,0);
 			//System.out.println("lol");
 			//Game.map.parties.get(0).members.get(0).setTilePosition(Game.map.mapData.startI, Game.map.mapData.startJ);
@@ -204,8 +244,23 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 			int i = (int)v.x/Cst.TILE_W;
 			int j = (int)v.y/Cst.TILE_H;
 			
-			GameMover mover = Game.map.parties.get(0).members.get(0);
-			mover.findPath(i, j);
+			if(i<=0 || j <=0 || i>=Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
+				return false;
+			}
+			
+			if(Game.map.mapData.tilemap[i][j+1] != 15){
+				j += 1;
+			}
+			
+			
+			if(Game.map.mapData.tilemap[i][j] != 15){
+				DestroyWallAction action = new DestroyWallAction();
+				action.setup(Game.map.parties.get(0), i, j);
+				Game.map.parties.get(0).actionQueue.add(action);
+				
+			}
+			//GameMover mover = Game.map.parties.get(0).units.get(0);
+			//mover.findPath(i, j);
 		}
 
 		return true;

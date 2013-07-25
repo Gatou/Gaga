@@ -7,9 +7,9 @@ import aurelienribon.tweenengine.equations.Linear;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.me.mygdxgame.App;
-import com.me.mygdxgame.ia.AStarPathFinder;
-import com.me.mygdxgame.ia.Mover;
-import com.me.mygdxgame.ia.Path;
+import com.me.mygdxgame.ai.pathfinding.AStarPathFinder;
+import com.me.mygdxgame.ai.pathfinding.Mover;
+import com.me.mygdxgame.ai.pathfinding.Path;
 import com.me.mygdxgame.sprite.SpriteBase;
 import com.me.mygdxgame.utils.Cst;
 import com.me.mygdxgame.utils.Point2f;
@@ -22,7 +22,7 @@ public class GameMover extends GameEntity implements Mover{
 	//public float x, y;
 	public Sprite sprite;
 	
-	private Path path;
+	public Path path;
 	private int pathIndex;
 	private boolean moving;
 	
@@ -100,7 +100,7 @@ public class GameMover extends GameEntity implements Mover{
 			path = null;
 			
 			moving = false;
-			System.out.println(moving);
+			//System.out.println(moving);
 			return;
 		}
 		if(moving){
@@ -141,6 +141,10 @@ public class GameMover extends GameEntity implements Mover{
 	}
 	
 	public void findPath(int destI, int destJ){
+		if(path != null){
+			return;
+		}
+		//System.out.println("lala");
 		//System.out.println("Path finder:" + mover.getTileI() + " " + mover.getTileJ() +" " + i +" " + j);
 		AStarPathFinder pathFinder = new AStarPathFinder(Game.map, 5000, false);
 		
@@ -149,7 +153,7 @@ public class GameMover extends GameEntity implements Mover{
 		pathIndex = 0;
 	}
 	
-	
+	/*
 	private final TweenCallback stepCompletedCallback = new TweenCallback() {
 		    @Override
 		    public void onEvent(int type, BaseTween<?> source) {
@@ -157,5 +161,5 @@ public class GameMover extends GameEntity implements Mover{
 		    	updatePath();
 		    }
 		};
-	
+	*/
 }

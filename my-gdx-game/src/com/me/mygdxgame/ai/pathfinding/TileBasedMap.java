@@ -1,4 +1,4 @@
-package com.me.mygdxgame.ia;
+package com.me.mygdxgame.ai.pathfinding;
 
 import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.utils.Point2i;

@@ -16,7 +16,7 @@ import com.me.mygdxgame.utils.TweenXYAccessor;
 
 public class App implements ApplicationListener{
 	
-	public TweenManager tweenManager = new TweenManager();
+	public TweenManager tweenManager;
 	private static App instance;
 	
 	public static App instance(){
@@ -29,7 +29,7 @@ public class App implements ApplicationListener{
 	public SceneBase scene;
 	
 	private App() {
-		Tween.registerAccessor(GameMover.class, new TweenXYAccessor());
+		
 	}
 	
 	@Override 
@@ -65,7 +65,8 @@ public class App implements ApplicationListener{
 		//Gdx.graphics.setDisplayMode(800, 480, false);
 		//Gdx.graphics.setVSync(true);
 		//resize(0, 0);
-		
+		tweenManager = new TweenManager();
+		Tween.registerAccessor(GameMover.class, new TweenXYAccessor());
 	}
 	
 	@Override

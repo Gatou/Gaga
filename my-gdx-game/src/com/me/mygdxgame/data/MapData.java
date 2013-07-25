@@ -1,16 +1,17 @@
 package com.me.mygdxgame.data;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import com.me.mygdxgame.game.Game;
-import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.game.GameParty;
+import com.me.mygdxgame.game.unit.GameUnit;
+import com.me.mygdxgame.game.unit.GameUnit.UnitType;
 import com.me.mygdxgame.sprite.SpriteBase;
-import com.me.mygdxgame.utils.Cst;
 
 public class MapData extends DataBase{
 
+	final static int FLOOR_INDEX = 15;
+	
 	//public int tilesetId;
 	public int width;
 	public int height;
@@ -35,20 +36,46 @@ public class MapData extends DataBase{
 		
 		for(int i=0; i<width; i++){
 			for(int j=0; j<height; j++){
-				tilemap[i][j] = 15;
+				tilemap[i][j] = 0;
 			}
 		}
 		
 		startI = 1+rand.nextInt(width-2);
 		startJ = 1+rand.nextInt(width-2);
 		
-		generateCross(startI, startJ, (short) 0, 4, 0);
-		
-		GameMover mover = new GameMover(new SpriteBase("character.png"), 0, 0);
-		mover.setTilePosition(startI, startJ);
 		GameParty party = new GameParty();
-		party.members.add(mover);
 		Game.map.parties.add(party);
+		
+		//setTile(5,5,(short) 15);
+		//setTile(5,5+1,(short) 15);
+		
+        for(int i=0; i<width; i++){
+        	for(int j=0; j<height; j++){
+        		if(i<=0 || j <=0 || i>=Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
+        			//continue;
+        			Game.map.mapData.tilemap[i][j] = -1;
+        		}
+        	}
+        }
+        
+		generateCross(startI, startJ, (short) 15, 4, 0);
+		
+		
+
+
+		
+		GameUnit mover = new GameUnit(new SpriteBase("character.png"), 0, 0, UnitType.PIONEER);
+		mover.setTilePosition(startI, startJ);
+		party.units.add(mover);
+		
+		mover = new GameUnit(new SpriteBase("character.png"), 0, 0, UnitType.PIONEER);
+		mover.setTilePosition(startI-1, startJ);
+		party.units.add(mover);
+		
+		mover = new GameUnit(new SpriteBase("character.png"), 0, 0, UnitType.PIONEER);
+		mover.setTilePosition(startI+1, startJ);
+		party.units.add(mover);
+		
 		//setTile(5+1,5+1,(short) 0);
 		//setTile(5,5+2,(short) 0);
 		/*
@@ -123,68 +150,102 @@ public class MapData extends DataBase{
 		ii = i;
 		jj = j-1;
 		if(posValid(ii, jj)){
+			if(tilemap[ii][jj] >= 16){
+				tilemap[ii][jj] = 0;
+			}
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits2[0], bits2[1], bits[2], bits[3]});
+			short index = bitsToIndex(new boolean[]{bits2[0], bits2[1], bits2[2], bits[3]});
+			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
 		}
 		
 		//2
 		ii = i;
 		jj = j+1;
 		if(posValid(ii, jj)){
+			if(tilemap[ii][jj] >= 16){
+				tilemap[ii][jj] = 0;
+			}
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits[0], bits[1], bits2[2], bits2[3]});
+			short index = bitsToIndex(new boolean[]{bits2[0], bits[1], bits2[2], bits2[3]});
+			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
 		}
 		
 		//4
 		ii = i-1;
 		jj = j;
 		if(posValid(ii, jj)){
+			if(tilemap[ii][jj] >= 16){
+				tilemap[ii][jj] = 0;
+			}
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits2[0], bits[1], bits2[2], bits[3]});
+			short index = bitsToIndex(new boolean[]{bits2[0], bits2[1], bits[2], bits2[3]});
+			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
 		}
 
 		//6
 		ii = i+1;
 		jj = j;
 		if(posValid(ii, jj)){
+			if(tilemap[ii][jj] >= 16){
+				tilemap[ii][jj] = 0;
+			}
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits[0], bits2[1], bits[2], bits2[3]});
+			short index = bitsToIndex(new boolean[]{bits[0], bits2[1], bits2[2], bits2[3]});
+			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
 		}
 		
+		/*
 		//7
 		ii = i-1;
 		jj = j-1;
-		if(posValid(ii, jj)){
+		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits2[0], bits2[1], bits2[2], bits[3]});
+			short index = (short) (16 + bitsToIndex(new boolean[]{bits2[0], bits2[1], bits[2], bits2[3]}));
+			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
+			
 		}
 		
 		//9
 		ii = i+1;
 		jj = j-1;
-		if(posValid(ii, jj)){
+		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits2[0], bits2[1], bits[2], bits2[3]});
+			short index = (short) (16 + bitsToIndex(new boolean[]{bits2[0], bits2[1], bits2[2], bits[3]}));
+			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
 		}
 		
 		//1
 		ii = i-1;
 		jj = j+1;
-		if(posValid(ii, jj)){
+		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits2[0], bits[1], bits2[2], bits2[3]});
+			short index = (short) (16 + bitsToIndex(new boolean[]{bits2[0], bits[1], bits2[2], bits2[3]}));
+			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
 		}
 		
 		//3
 		ii = i+1;
 		jj = j+1;
-		if(posValid(ii, jj)){
+		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
 			bits2 = indexToBits(tilemap[ii][jj]);
-			tilemap[ii][jj] = bitsToIndex(new boolean[]{bits[0], bits2[1], bits2[2], bits2[3]});
-		}
+			short index = (short) (16 + bitsToIndex(new boolean[]{bits[0], bits2[1], bits2[2], bits2[3]}));
+			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
+			tilemap[ii][jj] = index;
+		}*/
+
 	}
 	
 	public boolean[] indexToBits(int index){
+		if(index == -1){
+			return new boolean[]{false, false, false, false};
+		}
 	    boolean[] bits = new boolean[4];
 	    for (int ii = 3; ii >= 0; ii--) {
 	        bits[ii] = (index & (1 << ii)) != 0;
@@ -201,5 +262,7 @@ public class MapData extends DataBase{
 	    }
 	    return result;
 	}
+	
+	
 	
 }
