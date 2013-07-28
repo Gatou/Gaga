@@ -1,4 +1,4 @@
-package com.me.mygdxgame.scene;
+package com.me.mygdxgame.scene.map;
 
 import java.util.List;
 
@@ -7,8 +7,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
@@ -19,10 +22,11 @@ import com.me.mygdxgame.game.Game;
 import com.me.mygdxgame.game.GameCamera;
 import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.game.action.DestroyWallAction;
-import com.me.mygdxgame.mgr.StageManager;
+import com.me.mygdxgame.mgr.UiManager;
+import com.me.mygdxgame.scene.SceneBase;
 import com.me.mygdxgame.sprite.SpriteBase;
 import com.me.mygdxgame.sprite.WallSpriteState;
-import com.me.mygdxgame.ui.MapUi;
+import com.me.mygdxgame.ui.map.MapUi;
 import com.me.mygdxgame.utils.Cst;
 import com.me.mygdxgame.utils.Grid;
 
@@ -35,21 +39,23 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 	SpriteBatch spriteBatch;
 	InputMultiplexer plex;
 	public static Grid grid = new Grid();
+	public MapUi mapUi;
 	
 	public SceneMap(){
 		//StageMgr.startStageLater(new StageMap());
 		Game.map.setup(-1);
 		plex = new InputMultiplexer();
 		
-		plex.addProcessor(StageManager.instance().stage);
+		plex.addProcessor(UiManager.instance().stage);
 		plex.addProcessor(this);
 		spriteBatch = new SpriteBatch();
 		//tileset = TextureManager.get("tileset.png");
 		Gdx.input.setInputProcessor(plex);
 		
-		StageManager.instance().clear();
-		StageManager.instance().setFpsVisible(true);
-		StageManager.instance().setRoot(new MapUi());
+		mapUi = new MapUi();
+		UiManager.instance().clear();
+		UiManager.instance().setFpsVisible(true);
+		UiManager.instance().setRoot(mapUi);
 		
 	}
 
@@ -69,10 +75,12 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 		
 		spriteBatch.setProjectionMatrix(Game.camera.combined);
 		
+		//Gdx.graphics.getGL20().glClearColor( 1, 0, 0, 1 );
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
         spriteBatch.begin();
         
+        short[][] tilemap = Game.map.mapData.tilemap;
         GameCamera cam = Game.camera;
         
         Vector3 tmp = new Vector3();
@@ -84,106 +92,65 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
         startI = Math.max(startI, 0);
         startJ = Math.max(startJ, 0);
         
-        int endI =  startI + (int)((cam.width())/Cst.TILE_W)+2;
-        int endJ =  startJ + (int)((cam.height())/Cst.TILE_H)+10;
+        int iOffset = 2;
+        int jOffset = 10;
+        
+        int baseEndI = startI + (int)((cam.width())/Cst.TILE_W);
+        int endI = baseEndI  + iOffset;
+        int baseEndJ =  startJ + (int)((cam.height())/Cst.TILE_H);
+        int endJ = baseEndJ + jOffset;
         endI = Math.min(endI, Game.map.mapData.width);
         endJ = Math.min(endJ, Game.map.mapData.height);
+
         
-        //System.out.println(endI);
-        
+        SpriteBase sprite = new SpriteBase("tileset6.png");
+        SpriteBase highlightedSprite = new SpriteBase("highlightedSprite.png");
+		highlightedSprite.setOrigin(0, Cst.WALL_HEIGHT);
+		highlightedSprite.setColor(1f, 1f, 1f, 0.5f);
+		
+        //Draw floor
         for(int i=startI; i<endI; i++){
         	for(int j=startJ; j<endJ; j++){
-        		if(i<=0 || j <=0 || i>=Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
+        		
+        		short spriteIndex = tilemap[i][j];
+        		
+        		if(spriteIndex != 0){
         			continue;
-        			//Game.map.mapData.tilemap[i][j] = -1;
         		}
-				int spriteIndex = Game.map.mapData.tilemap[i][j];
-				if(spriteIndex == 0){
-					if(Game.map.mapData.tilemap[i-1][j] != 15 && Game.map.mapData.tilemap[i+1][j] != 15 && Game.map.mapData.tilemap[i][j+1] != 15 && Game.map.mapData.tilemap[i][j-1] != 15){
-						Game.map.mapData.tilemap[i][j] = -1;
-					}
-					/*
-					SpriteBase sprite = new SpriteBase("tileset4.png");
-					sprite.setRegion((spriteIndex%16)*Cst.TILE_W, 64, Cst.TILE_W, 64);
-					sprite.setSize(Cst.TILE_W, 128);
-					sprite.flip(false, true);
-					sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
-					sprite.draw(spriteBatch);*/
-				}
+        		
+				sprite.setRegion((spriteIndex%16)*Cst.TILE_W, (spriteIndex/16)*Cst.TILE_PLUS_WALL_HEIGHT, Cst.TILE_W, Cst.TILE_H);
+				sprite.setSize(Cst.TILE_W, Cst.TILE_H);
+				sprite.flip(false, true);
+				sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
+				sprite.draw(spriteBatch);
         	}
         }
         
-        for(int i=startI; i<endI; i++){
-        	for(int j=startJ; j<endJ; j++){
-				int spriteIndex = Game.map.mapData.tilemap[i][j];
-				if(spriteIndex == 15){
-					SpriteBase sprite = new SpriteBase("tileset4.png");
-					sprite.setRegion((spriteIndex%16)*Cst.TILE_W, (spriteIndex/16)*128, Cst.TILE_W, 128);
-					sprite.setSize(Cst.TILE_W, 128);
-					sprite.flip(false, true);
-					sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
-					sprite.draw(spriteBatch);
-				}
-        	}
-        }
         
         for(int j=startJ; j<endJ; j++){
         	for(int i=startI; i<endI; i++){
-        	
-				int spriteIndex = Game.map.mapData.tilemap[i][j];
-				if(spriteIndex != 15){
-					//if(spriteIndex==15){
-					//	continue;
-					//}
-					SpriteBase sprite = new SpriteBase("tileset4.png");
-					
-					if(spriteIndex == -1){
-						sprite.setRegion((15%16)*Cst.TILE_W, 64, Cst.TILE_W, 64);
-						sprite.setSize(Cst.TILE_W, 64);
-						//sprite.setColor(0.5f, 0.5f, 0.5f, 0.5f);
-						sprite.setOrigin(0, 64);
+        		
+        		sprite.setColor(1f, 1f, 1f, 1f);
+        		//spriteBatch.setColor(1f, 1f, 1f, 1f);
+		        //spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);  
+        		
+        		WallSpriteState wallState = Game.map.parties.get(0).wallStates.get(i, j);
+				if(wallState != null){
+					//System.out.println(i + " " + j);
+					if(wallState.selected){
+						sprite.setColor(1f, 1f, 0f, 1f);
+						//Pixmap pixmap = new Pixmap();
+				         //spriteBatch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE);
+				         //spriteBatch.setColor(1, 1, 0, 1f);
+				         //spriteBatch.draw(region, position.x, position.y);
+				         //spriteBatch.setColor(1f, 1f, 1f, 1f);
+				         //spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);  
+				         
+						//highlightedSprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
+						//highlightedSprite.draw(spriteBatch);
 					}
-					else{
-						sprite.setRegion((spriteIndex%16)*Cst.TILE_W, (spriteIndex/16)*128, Cst.TILE_W, 128);
-						sprite.setSize(Cst.TILE_W, 128);
-						sprite.setOrigin(0, 64);
-					}
-					
-					
-					//Sprite sprite = SpriteManager.instance().get(0);
-					//sprite.setSize(32, 96);
-					//sprite.setBounds(0, -96, 32, -96);
-					//sprite.setRegion((spriteIndex%16)*Cst.TILE_W, 0, 32, 96);
-					
-					//if(spriteIndex==0){
-						//sprite.setOrigin(0, 0);
-						//continue;
-					//}
-					//else{
-						//sprite.setOrigin(0, 64);
-						//sprite.setColor(1f, 1f, 1f, 0.5f);
-						// normalement sprite.setOrigin(0, 96); voir si pb lors du render order
-						//continue;
-					//}
-					//sprite.setOrigin(0, 0);
-					sprite.flip(false, true);
-					sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
-					
-					WallSpriteState wallState = Game.map.parties.get(0).wallStates.get(i, j);
-					if(wallState != null){
-						//System.out.println(i + " " + j);
-						if(wallState.selected){
-							sprite.setColor(1, 0, 0, 1);
-						}
-					}
-					
-					/*
-					if(Game.map.mapData.tilemap[i][j-1] == 15){
-						Color c = sprite.getColor();
-						sprite.setColor(c.r, c.g, c.b, 0.8f);
-					}*/
-					sprite.draw(spriteBatch);
 				}
+				
 				List<GameMover> events =  Game.map.eventsAt(i, j);
 				if(events != null){
 					for(GameMover event : events){
@@ -193,17 +160,79 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 					}
 				}
 				
+        		short spriteIndex = tilemap[i][j];
+        		
+        		if(spriteIndex != 0 && spriteIndex != 0xF00){
+        		
+	        		short borderIndex = (short) (tilemap[i][j] & 0x0F);
+	        		if(borderIndex != 0){
+						sprite.setRegion((borderIndex%16)*Cst.TILE_W, (borderIndex/16)*Cst.TILE_PLUS_WALL_HEIGHT, Cst.TILE_W, Cst.TILE_PLUS_WALL_HEIGHT);
+						sprite.setSize(Cst.TILE_W, Cst.TILE_PLUS_WALL_HEIGHT);
+						sprite.flip(false, true);
+						sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
+						sprite.setOrigin(0, Cst.WALL_HEIGHT);
+						sprite.draw(spriteBatch);
+	        		}
+	        		
+					short cornerIndex = (short) (tilemap[i][j] & 0xF0);
+	        			
+	        		if((cornerIndex & 0x10) == 0x10){
+	        			sprite.setRegion(0, Cst.TILE_H, Cst.TILE_HW, Cst.TILE_HH);
+	            		sprite.setSize(Cst.TILE_HW, Cst.TILE_HH);
+	    				sprite.flip(false, true);
+	    				sprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
+	    				sprite.setOrigin(0, Cst.WALL_HEIGHT);
+	    				sprite.draw(spriteBatch);
+	        		}
+	        		if((cornerIndex & 0x20) == 0x20){
+	        			sprite.setRegion(Cst.TILE_HW, Cst.TILE_H, Cst.TILE_HW, Cst.TILE_HH);
+	        			sprite.setSize(Cst.TILE_HW, Cst.TILE_HH);
+	    				sprite.flip(false, true);
+	    				sprite.setPosition(Cst.TILE_HW+i*Cst.TILE_W, j*Cst.TILE_H);
+	    				sprite.setOrigin(0, Cst.WALL_HEIGHT);
+	    				sprite.draw(spriteBatch);
+	        		}
+	        		if((cornerIndex & 0x40) == 0x40){
+	        			sprite.setRegion(Cst.TILE_HW, Cst.TILE_H+Cst.TILE_HH, Cst.TILE_HW, Cst.TILE_HH);
+	        			sprite.setSize(Cst.TILE_HW, Cst.TILE_HH);
+	    				sprite.flip(false, true);
+	    				sprite.setPosition(Cst.TILE_HW+i*Cst.TILE_W, Cst.TILE_HH+j*Cst.TILE_H);
+	    				sprite.setOrigin(0, Cst.WALL_HEIGHT);
+	    				sprite.draw(spriteBatch);
+	        		}
+	        		if((cornerIndex & 0x80) == 0x80){
+	        			sprite.setRegion(0, Cst.TILE_H+Cst.TILE_HH, Cst.TILE_HW, Cst.TILE_HH);
+	        			sprite.setSize(Cst.TILE_HW, Cst.TILE_HH);
+	    				sprite.flip(false, true);
+	    				sprite.setPosition(i*Cst.TILE_W, Cst.TILE_HH+j*Cst.TILE_H);
+	    				sprite.setOrigin(0, Cst.WALL_HEIGHT);
+	    				sprite.draw(spriteBatch);
+	        		}
+        		}
+				
+
+				
+				if(wallState != null){
+					//System.out.println(i + " " + j);
+					if(wallState.selected){
+						highlightedSprite.setPosition(i*Cst.TILE_W, j*Cst.TILE_H);
+						highlightedSprite.draw(spriteBatch);
+					}
+				}
+				
 			}
 		}
         
-		
+
+        mapUi.minimap.update(spriteBatch, startI, startJ, Math.min(baseEndI, Game.map.mapData.width), Math.min(baseEndJ, Game.map.mapData.height));
+        //mapUi.update();
+        //spriteBatch.draw(dynamicTexture, 0, 0, 0, 0, 60, 60, 1, 1);
+        
 		spriteBatch.end();
 		//grid.update(startI, startJ, endI, endJ);
 
         
 	}
-
-
 	
 	public void terminate() {
 		super.terminate();
@@ -226,10 +255,16 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 	public boolean keyTyped(char character) {
 		switch(character) {
 		case '-':
-			Game.camera.zoom *= 1.2;
+			if(Game.camera.zoom >= 8){
+				return false;
+			}
+			Game.camera.zoom *= 2;
 			break;
 		case '+':
-			Game.camera.zoom /= 1.2;
+			if(Game.camera.zoom <= 0.25){
+				return false;
+			}
+			Game.camera.zoom /= 2;
 			break;
 		case '5':
 			//System.out.println("lala");
@@ -249,28 +284,30 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 			Ray pickRay = Game.camera.getPickRay(x, y);
 			Intersector.intersectRayPlane(pickRay, Cst.XY_PLANE, v);
 			
-			if(v.x < 0 || v.y < 0){
+			float dy = v.y + Cst.WALL_HEIGHT;
+			if(v.x < 0 || dy < 0){
 				return false;
 			}
 			
 			int i = (int)v.x/Cst.TILE_W;
-			int j = (int)v.y/Cst.TILE_H;
+			int j = (int)dy/Cst.TILE_H;
 			
 			//System.out.println(i + " " + j);
-			if(i<=0 || j < 0 || i >= Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
+			if(i<=0 || j <= 0 || i >= Game.map.mapData.width-1 || j >= Game.map.mapData.height-1){
 				return false;
 			}
 
-			if((j==0 && Game.map.mapData.tilemap[i][j+1] == 15) || (j==Game.map.mapData.height-2 && Game.map.mapData.tilemap[i][j+1] != 15)){
+			if((j==0 && Game.map.mapData.tilemap[i][j+1] == 0) || (j==Game.map.mapData.height-2 && Game.map.mapData.tilemap[i][j+1] != 0)){
 				return false;
 			}
-			
-			if(j+1 < Game.map.mapData.height-1 && Game.map.mapData.tilemap[i][j+1] != 15){
+			/*
+			if(j+1 < Game.map.mapData.height-1 && Game.map.mapData.tilemap[i][j+1] != 0){
+				System.out.println("olé");
 				j += 1;
-			}
+			}*/
 			
-			
-			if(Game.map.mapData.tilemap[i][j] != 15){
+			//System.out.println(Game.map.mapData.tilemap[i][j]);
+			if(Game.map.mapData.tilemap[i][j] != 0){
 				DestroyWallAction cachedAction = DestroyWallAction.cache.get(i, j);
 				if(cachedAction != null){
 					cachedAction.interrupt();
@@ -316,6 +353,7 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 
 	//@Override
 	public boolean touchMoved(int x, int y) {
+
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -335,6 +373,11 @@ public class SceneMap extends SceneBase implements InputProcessor, GestureListen
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
+		/*
+		Vector3 v = new Vector3();
+		Ray pickRay = Game.camera.getPickRay(screenX, screenY);
+		Intersector.intersectRayPlane(pickRay, Cst.XY_PLANE, v);
+		System.out.println(v.x + " " + v.y);*/
 		return true;
 	}
 

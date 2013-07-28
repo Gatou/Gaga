@@ -12,20 +12,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 
-public class StageManager {
+public class UiManager {
 
-	private static StageManager instance;
-	
-
+	private static UiManager instance;
 	
 	public Stage stage = null;
 	public Skin skin;
 	//public static Touchpad touchpad;
 	public Label fpsLabel;
 
-	private StageManager() {
+	private UiManager() {
 		skin = new Skin(Gdx.files.internal("Graphics/Window/uiskin.json"));
 		
+		/*
 		Pixmap pixmap = new Pixmap(1, 1, Format.RGBA8888);
 		pixmap.setColor(Color.WHITE);
 		pixmap.fill();
@@ -35,16 +34,16 @@ public class StageManager {
 		skin.add("default", new BitmapFont());
 
 		// Configure a TextButtonStyle and name it "default". Skin resources are stored by type, so this doesn't overwrite the font.
+		
 		TextButtonStyle textButtonStyle = new TextButtonStyle();
 		textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
 		textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
 		textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
 		textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
 		textButtonStyle.font = skin.getFont("default");
-		skin.add("default", textButtonStyle);
+		skin.add("default", textButtonStyle);*/
 		
 		stage = new Stage();
-
 		
 		fpsLabel = new Label("", skin);
 		fpsLabel.setFillParent(true);
@@ -54,15 +53,16 @@ public class StageManager {
 		
 	}
 	
-	public static StageManager instance(){
+	public static UiManager instance(){
 		if(instance == null){
-			instance = new StageManager();
+			instance = new UiManager();
 		}
 		return instance;
 	}
 	
 	public void resize (int width, int height) {
-		stage.setViewport(width, height, true);
+		stage.setViewport(width, height, false);
+		//stage.getCamera()
 	}
 
 	public void dispose() {

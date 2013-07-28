@@ -93,7 +93,7 @@ public abstract class GameTiledMap implements TileBasedMap{
 
 	@Override
 	public boolean blocked(GameMover mover, int i, int j) {
-		boolean mapCollision = mapData.tilemap[i][j] != 15; 
+		boolean mapCollision = mapData.tilemap[i][j] != 0; 
 		if(mapCollision){
 			return true;
 		}

@@ -24,30 +24,31 @@ public class MapData extends DataBase{
 	public MapData(int id, String name) {
 		super(id, name);
 		//tilesetId = 0;
-		//collisionMap = new byte[][]{
+		//collisionMap = new short[][]{
 		
 	}
 
 	public void generateRandomMap(){
 		Random rand = new Random();
-		width = 16;
-		height = 16;
+		width = 100;
+		height = 100;
 		tilemap = new short[width][height];
 		
 		for(int i=0; i<width; i++){
 			for(int j=0; j<height; j++){
-				tilemap[i][j] = 0;
+				tilemap[i][j] = 0xF00;
 			}
 		}
 		
-		startI = 1+rand.nextInt(width-2);
+		//startI = 1+rand.nextInt(width-2);
 		//startJ = 1+rand.nextInt(width-2);
-		startJ = 14;
+		startI = 50;
+		startJ = 50;
 		
 		GameParty party = new GameParty();
 		Game.map.parties.add(party);
 		
-		//setTile(5,5,(short) 15);
+		//setTile(5,5, (short) 15);
 		//setTile(5,5+1,(short) 15);
 		/*
         for(int i=0; i<width; i++){
@@ -59,7 +60,7 @@ public class MapData extends DataBase{
         	}
         }*/
         
-		generateCross(startI, startJ, (short) 15, 4, 0);
+		generateCross(startI, startJ, 4, 0);
 		
 		
 
@@ -97,7 +98,7 @@ public class MapData extends DataBase{
 	}
 	
 
-	private void generateCross(int i, int j, short tileIndex, int maxDepth, int currentDepth){
+	private void generateCross(int i, int j, int maxDepth, int currentDepth){
 		if(currentDepth >= maxDepth){
 			return;
 		}
@@ -105,23 +106,24 @@ public class MapData extends DataBase{
 		if(i<=0 || j<=0 || i>=width-1 || j>=height-1){
 			return;
 		}
-		boolean tileValid = setTile(i, j, tileIndex);
+		boolean tileValid = setTile(i, j);
 		
 		if(tileValid){
 		
-			generateCross(i+1, j, tileIndex, maxDepth, currentDepth+1);
-			generateCross(i-1, j, tileIndex, maxDepth, currentDepth+1);
-			generateCross(i, j+1, tileIndex, maxDepth, currentDepth+1);
-			generateCross(i, j-1, tileIndex, maxDepth, currentDepth+1);
+			generateCross(i+1, j, maxDepth, currentDepth+1);
+			generateCross(i-1, j, maxDepth, currentDepth+1);
+			generateCross(i, j+1, maxDepth, currentDepth+1);
+			generateCross(i, j-1, maxDepth, currentDepth+1);
 		}
 	}	
 	
-	public boolean setTile(int i, int j, short tileIndex){
+	public boolean setTile(int i, int j){
 		if(!posValid(i, j)){
 			return false;
 		}
-		tilemap[i][j] = tileIndex;
-		applyAutoTile(i, j, tileIndex);
+		//System.out.println(i + " " + j + " " + tileIndex);
+		tilemap[i][j] = 0;
+		applyAutoTile(i, j, (short) 0xFF);
 		return true;
 	}
 	
@@ -141,105 +143,132 @@ public class MapData extends DataBase{
 		return true;
 	}
 	
-	public void applyAutoTile(int i, int j, int newTileIndex){
-		boolean[] bits = indexToBits(newTileIndex);
-		boolean[] bits2;
+	public short adjustBits(short bits){
+		//if W border then no NW-SW corner
+		if((bits & 0x01) == 0x01){ 
+			bits = (short) (bits & 0x6F);
+		}
+		//if N border then no NW-NE corner
+		if((bits & 0x02) == 0x02){ 
+			bits = (short) (bits & 0xCF);
+		}
+		//if E border then no NE-SE corner
+		if((bits & 0x04) == 0x04){
+			bits = (short) (bits & 0x9F);
+		}
+		//if S border then no SE-SW corner
+		if((bits & 0x08) == 0x08){
+			bits = (short) (bits & 0x3F);
+		}
+		return bits;
+	}
+	
+	public void applyAutoTile(int i, int j, short newTileBits){
+		//boolean[] bits = indexToBits(newTileIndex);
+		//boolean[] bits2;
 		int ii, jj;
 		
-		
-		//8
-		ii = i;
-		jj = j-1;
+		//6
+		ii = i+1;
+		jj = j;
 		if(posValid(ii, jj)){
-			if(tilemap[ii][jj] >= 16){
-				tilemap[ii][jj] = 0;
+			short bits = tilemap[ii][jj];
+			if(bits != 0){
+				bits = (short) (bits | (short)0x01);
+				bits = adjustBits(bits);
+	
+				tilemap[ii][jj] = bits;
 			}
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = bitsToIndex(new boolean[]{bits2[0], bits2[1], bits2[2], bits[3]});
-			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
-		}
-		
-		//2
-		ii = i;
-		jj = j+1;
-		if(posValid(ii, jj)){
-			if(tilemap[ii][jj] >= 16){
-				tilemap[ii][jj] = 0;
-			}
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = bitsToIndex(new boolean[]{bits2[0], bits[1], bits2[2], bits2[3]});
-			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
+			
 		}
 		
 		//4
 		ii = i-1;
 		jj = j;
 		if(posValid(ii, jj)){
-			if(tilemap[ii][jj] >= 16){
-				tilemap[ii][jj] = 0;
+			short bits = tilemap[ii][jj];
+			if(bits != 0){
+				bits = (short) (bits | (short)0x04);
+				bits = adjustBits(bits);
+				tilemap[ii][jj] = bits;
 			}
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = bitsToIndex(new boolean[]{bits2[0], bits2[1], bits[2], bits2[3]});
-			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
-		}
-
-		//6
-		ii = i+1;
-		jj = j;
-		if(posValid(ii, jj)){
-			if(tilemap[ii][jj] >= 16){
-				tilemap[ii][jj] = 0;
-			}
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = bitsToIndex(new boolean[]{bits[0], bits2[1], bits2[2], bits2[3]});
-			if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
 		}
 		
-		/*
+		//8
+		ii = i;
+		jj = j-1;
+		if(posValid(ii, jj)){
+			short bits = tilemap[ii][jj];
+			if(bits != 0){
+				bits = (short) (bits | (short)0x08);
+				bits = adjustBits(bits);
+				tilemap[ii][jj] = bits;
+			}
+		}
+		
+
+		
+		//2
+		ii = i;
+		jj = j+1;
+		if(posValid(ii, jj)){
+			short bits = tilemap[ii][jj];
+			if(bits != 0){
+				bits = (short) (bits | (short)0x02);
+				bits = adjustBits(bits);
+				tilemap[ii][jj] = bits;
+			}
+		}
+		
+		
 		//7
 		ii = i-1;
 		jj = j-1;
-		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = (short) (16 + bitsToIndex(new boolean[]{bits2[0], bits2[1], bits[2], bits2[3]}));
-			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
+		if(posValid(ii, jj)){
+			short bits = tilemap[ii][jj];
 			
+			if(bits != 0){
+				bits = (short) (bits | (short)0x40);
+				bits = adjustBits(bits);
+				tilemap[ii][jj] = bits;
+			}
 		}
 		
 		//9
 		ii = i+1;
 		jj = j-1;
-		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = (short) (16 + bitsToIndex(new boolean[]{bits2[0], bits2[1], bits2[2], bits[3]}));
-			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
+		if(posValid(ii, jj)){
+			short bits = tilemap[ii][jj];
+			if(bits != 0){
+				bits = (short) (bits | (short)0x80);
+				bits = adjustBits(bits);
+				tilemap[ii][jj] = bits;
+			}
 		}
 		
 		//1
 		ii = i-1;
 		jj = j+1;
-		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = (short) (16 + bitsToIndex(new boolean[]{bits2[0], bits[1], bits2[2], bits2[3]}));
-			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
+		if(posValid(ii, jj)){
+			short bits = tilemap[ii][jj];
+			if(bits != 0){
+				bits = (short) (bits | (short)0x20);
+				bits = adjustBits(bits);
+				tilemap[ii][jj] = bits;
+			}
 		}
 		
 		//3
 		ii = i+1;
 		jj = j+1;
-		if(posValid(ii, jj) && (tilemap[ii][jj] <= 0 || tilemap[ii][jj] >= 16)){
-			bits2 = indexToBits(tilemap[ii][jj]);
-			short index = (short) (16 + bitsToIndex(new boolean[]{bits[0], bits2[1], bits2[2], bits2[3]}));
-			//if(tilemap[ii][jj] != 15 && index == 15){ index = 0; }
-			tilemap[ii][jj] = index;
-		}*/
+		if(posValid(ii, jj)){
+			short bits = tilemap[ii][jj];
+			if(bits != 0){
+				bits = (short) (bits | (short)0x10);
+				bits = adjustBits(bits);
+				tilemap[ii][jj] = bits;
+			}
+		}
 
 	}
 	

@@ -12,7 +12,9 @@ public class GameCamera extends OrthographicCamera{
 	}
 	
 	public void resize(int width, int height) {
+		Vector3 pos = new Vector3(position);
 		setToOrtho(true, width, height);
+		position.set(pos);
 	}
 	
 	public void moveToStartPosition(){
@@ -22,7 +24,11 @@ public class GameCamera extends OrthographicCamera{
 		//System.out.println(i*Cst.TILE_W);
 		
 		//position.set(-60, 0, 0);
-		setPosition(i*Cst.TILE_W + Cst.TILE_W_HALF, j*Cst.TILE_H + Cst.TILE_H_HALF);
+		moveToTile(i, j);
+	}
+	
+	public void moveToTile(int i, int j){
+		setPosition(i*Cst.TILE_W + Cst.TILE_HW, j*Cst.TILE_H + Cst.TILE_HH);
 	}
 	
 	public void setPosition(float x, float y){

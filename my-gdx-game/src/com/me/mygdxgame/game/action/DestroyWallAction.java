@@ -45,6 +45,7 @@ public class DestroyWallAction extends GameAction{
 	}
 	
 	public void update(){
+		
 		super.update();
 		
 		if(interrupted){
@@ -75,7 +76,7 @@ public class DestroyWallAction extends GameAction{
 	}
 	
 	public void completed(){
-		Game.map.mapData.setTile(i, j, (short)15);
+		Game.map.mapData.setTile(i, j);
 		clear();
 	}
 	

@@ -7,9 +7,9 @@ import com.badlogic.gdx.ApplicationListener;
 import com.me.mygdxgame.game.Game;
 import com.me.mygdxgame.game.GameMover;
 import com.me.mygdxgame.mgr.DataMgr;
-import com.me.mygdxgame.mgr.StageManager;
+import com.me.mygdxgame.mgr.UiManager;
 import com.me.mygdxgame.scene.SceneBase;
-import com.me.mygdxgame.scene.SceneMap;
+import com.me.mygdxgame.scene.map.SceneMap;
 import com.me.mygdxgame.utils.Cst;
 import com.me.mygdxgame.utils.TweenXYAccessor;
 
@@ -59,7 +59,7 @@ public class App implements ApplicationListener{
 	    //System.out.println(person.tilemap[1][4]);	
 		//Debug.setDebugMode(true);
 		DataMgr.init();
-		StageManager.instance();
+		UiManager.instance();
 		//TweenMgr.init();
 		//ScriptMgr.init();
 		//Gdx.graphics.setDisplayMode(800, 480, false);
@@ -88,7 +88,7 @@ public class App implements ApplicationListener{
 		width = Cst.VIEWPORT_WIDTH;
 		height = Cst.VIEWPORT_HEIGHT;
 		Game.camera.resize(width,height);
-		StageManager.instance().resize(width, height);
+		UiManager.instance().resize(width, height);
 	}
 	
 	@Override
